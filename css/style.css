@@ -1,0 +1,438 @@
+/* ============================================================
+   相撲じゃんけん — style.css
+   相撲会場を画面いっぱいに広げ、その中央に「1画面で収まるカード」を置く。
+   カードは 土俵 / 操作パネル の2段を縦に積む。
+   ============================================================ */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "M PLUS Rounded 1c", "Noto Sans JP", sans-serif;
+  color: #333;
+  font-size: 16px;
+  /* 相撲会場の画像を画面いっぱいの背景にする（カードのまわりに広がる）。
+     上に半透明の暗幕を重ねて、中央のカードを引き立てる */
+  background: linear-gradient(rgba(20, 18, 30, 0.55), rgba(20, 18, 30, 0.55)),
+    #1c1a26 url("../images/background.png") center center / cover no-repeat fixed;
+  /* カードを画面の中央にぴたりと置く */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+/* カード全体。画面の高さに合わせ、中身を縦に積んで1画面に収める */
+.container {
+  width: 1000px;
+  max-width: 100%;
+  height: 100%;
+  max-height: 780px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  border: 2px solid #e8c87a;
+  box-shadow: 0 12px 45px rgba(0, 0, 0, 0.55);
+  overflow: hidden; /* 角丸からはみ出さないようにする */
+  /* ページを開いたときにふわっと出てくる */
+  animation: card-in 0.5s ease;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ------------------------------------------------------------
+   土俵エリア（背景画像）— カードの残りの高さをすべて使う
+   ------------------------------------------------------------ */
+.arena {
+  position: relative;
+  flex: 1; /* タイトルとパネルを除いた高さを全部使う */
+  min-height: 0; /* flex の中でちゃんと縮めるようにする */
+  background-color: #1c1a26;
+  overflow: hidden; /* 土俵の外へ倒れた力士がはみ出さないように */
+}
+
+.arena-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* エリアの大きさに合わせて土俵の画像を敷きつめる（足りない分は切り取る） */
+  object-fit: cover;
+  /* 上端をそろえて、会場上部の「心技体」の看板が切れないようにする */
+  object-position: center top;
+}
+
+/* 2人の力士のかたまり。left を変えて土俵を左右に動かす。
+   高さは土俵エリアに対する割合で決めるので、画面が変わっても収まる */
+.rikishi-spot {
+  position: absolute;
+  bottom: 5%; /* 土俵の上に足が乗る高さ */
+  left: 50%;
+  height: 84%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  z-index: 3;
+  /* 押されたときに、少し勢いをつけてスライドする */
+  transition: left 0.55s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+/* 力士（画像）。土俵エリアの高さに合わせて大きく表示する。
+   足もとを軸に動くよう transform-origin を下にする */
+.rikishi {
+  height: 100%;
+  width: auto;
+  display: block;
+  transform-origin: bottom center;
+  /* 土俵に影を落として、立っている感じを出す */
+  filter: drop-shadow(0 8px 7px rgba(0, 0, 0, 0.5));
+}
+
+/* 相手の力士は、腕が重なって組み合うよう少し内側へ寄せる */
+#rikishi-cpu {
+  margin-left: -64px;
+}
+
+/* 押した瞬間のふみこみ */
+.rikishi.lunge {
+  animation: lunge 0.35s ease;
+}
+@keyframes lunge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(8px);
+  }
+}
+
+/* 押し出されて土俵の外へ倒れる演出 */
+.rikishi.fall-right {
+  animation: fall-right 0.7s ease forwards;
+}
+.rikishi.fall-left {
+  animation: fall-left 0.7s ease forwards;
+}
+@keyframes fall-right {
+  to {
+    /* 少し小さくなりながら土俵の上へ倒れる（枠からはみ出して切れないように） */
+    transform: translate(12px, 16px) rotate(52deg) scale(0.78);
+  }
+}
+@keyframes fall-left {
+  to {
+    transform: translate(-12px, 16px) rotate(-52deg) scale(0.78);
+  }
+}
+
+/* ------------------------------------------------------------
+   操作パネル（カードの一番下。コンパクトに詰めて1画面に収める）
+   ------------------------------------------------------------ */
+.panel {
+  flex-shrink: 0; /* カードが縮んでも操作パネルは隠れないようにする */
+  background-color: #fffdf5;
+  padding: 10px 22px 12px;
+  text-align: center;
+}
+
+.panel-desc {
+  margin: 0 0 6px;
+  font-size: 11px;
+  color: #6b5d52;
+  line-height: 1.5;
+}
+
+/* 土俵の状況メッセージ */
+.dohyo-status {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #c0392b;
+}
+
+/* じゃんけんエリア（出した手の表示） */
+.janken-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 6px;
+}
+
+.janken-side {
+  width: 96px;
+}
+
+.janken-label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: bold;
+  color: #6b5d52;
+}
+
+.hand {
+  margin: 0;
+  font-size: 44px;
+  line-height: 1.1;
+  display: inline-block; /* 跳ねるアニメーションを効かせるため */
+}
+
+.janken-vs {
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
+  color: #c0392b;
+}
+
+/* 手を震わせる（カウントダウン中のドキドキ演出） */
+.hand.shaking {
+  animation: shake 0.12s linear infinite;
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(-3px, 2px) rotate(-8deg);
+  }
+  50% {
+    transform: translate(2px, -3px) rotate(6deg);
+  }
+  75% {
+    transform: translate(-2px, -2px) rotate(-5deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+/* 結果が出た瞬間に手をピョコッと跳ねさせる */
+.hand.pop {
+  animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.4);
+  }
+  60% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 勝敗の結果メッセージ（判定結果でクラスを付け替えて色が変わる） */
+.result {
+  margin: 0 0 8px;
+  padding: 9px;
+  border: 1px solid #e6dcc4;
+  border-radius: 10px;
+  background-color: #faf6e8;
+  font-size: 15px;
+  font-weight: bold;
+  /* メッセージが変わるたびに少し浮き上がる */
+  animation: result-in 0.35s ease;
+}
+
+@keyframes result-in {
+  from {
+    opacity: 0.3;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.result.win {
+  background-color: #fde7e6;
+  border-color: #f3b0ab;
+  color: #c0392b;
+}
+
+.result.lose {
+  background-color: #e9f0f7;
+  border-color: #aec6de;
+  color: #2a4d8f;
+}
+
+.result.draw {
+  background-color: #fff5da;
+  border-color: #f0d98a;
+  color: #c8951a;
+}
+
+/* スコア表示（取組の勝ち・負けの回数と勝率） */
+.score {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #6b5d52;
+}
+
+.score-item {
+  margin: 0;
+}
+
+.score-rate {
+  margin: 0;
+  padding-left: 10px;
+  border-left: 1px solid #e6dcc4;
+}
+
+.score-item span,
+.score-rate span {
+  font-size: 16px;
+  color: #c0392b;
+}
+
+/* 連勝記録 */
+.streak {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #8a7d70;
+}
+
+.streak-item {
+  margin: 0;
+}
+
+.streak-item span {
+  font-size: 15px;
+  color: #d6336c;
+}
+
+/* 手を選ぶボタン（絵文字だけ。見ればわかるので文字は置かない） */
+.buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.hand-button {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 34px; /* 手の絵文字を大きく見せる */
+  line-height: 1;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+
+/* グー＝藍色、チョキ＝朱色、パー＝萌黄色（和の色） */
+.hand-button[data-hand="0"] {
+  background: linear-gradient(45deg, #2a4d8f, #1c3766);
+  box-shadow: 0 4px 10px rgba(42, 77, 143, 0.4);
+}
+
+.hand-button[data-hand="1"] {
+  background: linear-gradient(45deg, #e8413a, #b82a24);
+  box-shadow: 0 4px 10px rgba(232, 65, 58, 0.4);
+}
+
+.hand-button[data-hand="2"] {
+  background: linear-gradient(45deg, #5aab3f, #3d8029);
+  box-shadow: 0 4px 10px rgba(90, 171, 63, 0.4);
+}
+
+.hand-button:hover {
+  transform: translateY(-2px);
+}
+
+.hand-button:active {
+  transform: translateY(1px);
+}
+
+/* カウントダウン中は押せないようにして、見た目も薄くする */
+.hand-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 下部のボタン（スコアリセット） */
+.footer-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.footer-button {
+  padding: 6px 16px;
+  border: 1px solid #d8cba8;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #6b5d52;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.footer-button:hover {
+  background-color: #faf6e8;
+}
+
+/* ============================================================
+   座布団（勝ったときに画面の上から舞う）
+   ============================================================ */
+
+/* 座布団を入れる透明な層。画面全体に重ねるが、クリックの邪魔はしない */
+.confetti-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 100;
+}
+
+/* 座布団 1 枚分。色と位置は script.js から指定する */
+.confetti {
+  position: absolute;
+  top: -24px;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  animation: confetti-fall 1.8s linear forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(105vh) rotate(540deg);
+    opacity: 0.9;
+  }
+}

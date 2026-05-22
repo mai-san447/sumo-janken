@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>相撲じゃんけん</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- 土俵（背景画像）。相撲さんはこの土俵の上に立つ -->
+      <div class="arena">
+        <img class="arena-img" src="images/background.png" alt="相撲会場" />
+        <!-- 2人の力士。#rikishi-spot の left を変えて土俵を左右に動かす -->
+        <div class="rikishi-spot" id="rikishi-spot">
+          <img class="rikishi" id="rikishi-you" src="images/rikishi-you.png" alt="あなたの力士" />
+          <img class="rikishi" id="rikishi-cpu" src="images/rikishi-cpu.png" alt="相手の力士" />
+        </div>
+      </div>
+
+      <!-- 操作パネル -->
+      <div class="panel">
+        <p class="panel-desc">
+          勝つと相手を土俵際へ一歩押し、2歩で押し出せば勝ち。あいこは仕切り直し。
+        </p>
+
+        <!-- 土俵の状況メッセージ（今どちらが押し気味か） -->
+        <p class="dohyo-status" id="dohyo-status">土俵中央。互角の仕切り！</p>
+
+        <!-- じゃんけんエリア（出した手の表示） -->
+        <div class="janken-area">
+          <div class="janken-side">
+            <p class="janken-label">あなた</p>
+            <p class="hand" id="my-hand">❓</p>
+          </div>
+          <p class="janken-vs">VS</p>
+          <div class="janken-side">
+            <p class="janken-label">コンピューター</p>
+            <p class="hand" id="cpu-hand">❓</p>
+          </div>
+        </div>
+
+        <!-- 勝敗・取組の結果メッセージ -->
+        <p class="result" id="result">手を選んで「はっけよい！」</p>
+
+        <!-- スコア表示（取組の勝ち・負けの回数と勝率） -->
+        <div class="score">
+          <p class="score-item">勝ち <span id="win-count">0</span></p>
+          <p class="score-item">負け <span id="lose-count">0</span></p>
+          <p class="score-rate">勝率 <span id="win-rate">0</span>%</p>
+        </div>
+
+        <!-- 連勝記録 -->
+        <div class="streak">
+          <p class="streak-item">🔥 連勝 <span id="streak-count">0</span></p>
+          <p class="streak-item">👑 最高連勝 <span id="best-streak">0</span></p>
+        </div>
+
+        <!-- 手を選ぶボタン（data-hand に手の番号 0・1・2 を持たせている）。
+             絵文字だけのボタン。読み上げ用に aria-label で手の名前を添える -->
+        <div class="buttons">
+          <button class="hand-button" data-hand="0" aria-label="グー">✊</button>
+          <button class="hand-button" data-hand="1" aria-label="チョキ">✌️</button>
+          <button class="hand-button" data-hand="2" aria-label="パー">🖐️</button>
+        </div>
+
+        <!-- スコアのリセット -->
+        <div class="footer-buttons">
+          <button class="footer-button" id="reset">スコアをリセット</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 座布団の演出を表示するための入れ物。勝ったときだけ中身が増える -->
+    <div class="confetti-layer" id="confetti-layer"></div>
+
+    <!-- ============================================================
+         効果音
+         音のファイルは sounds フォルダーに入れてください（README 参照）。
+         ファイルがなくてもゲームは動きます（音が鳴らないだけです）。
+         ============================================================ -->
+    <audio id="se-hyoshigi" src="sounds/hyoshigi.mp3" preload="auto"></audio>
+    <audio id="se-gyoji" src="sounds/sumo-call.mp3" preload="auto"></audio>
+    <audio id="se-kachi" src="sounds/cheer.mp3" preload="auto"></audio>
+    <audio id="se-make" src="sounds/lose.mp3" preload="auto"></audio>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
